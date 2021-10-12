@@ -7,15 +7,24 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = []
-    @ratings_to_show  = params[:ratings].keys unless params[:ratings].nil?
-    @movies = Movie.with_ratings(@ratings_to_show)
-  
+    session[:sort_by] = params[:sort_by] unless params[:sort_by].nil?
     
+    @ratings_to_show = []      
+    @ratings_to_show = params[:ratings].keys unless params[:ratings].nil?
 
+    @movies = Movie.with_ratings(@ratings_to_show)
+    
+    @movies = @movies.order(session[:sort_by]) unless session[:sort_by].nil?
+
+    case params[:sort_by]
+      when 'title'
+        @title_header = 'hilite bg-warning' 
+      when 'release_date'
+        @release_date_header = 'hilite bg-warning'
+    end
   end
+     
 
   def new
     # default: render 'new' template
