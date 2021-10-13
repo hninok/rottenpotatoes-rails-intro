@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
 
+
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -8,13 +9,13 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings
-    session[:sort_by] = params[:sort_by] unless params[:sort_by].nil?
-    
-    @ratings_to_show = []      
-    @ratings_to_show = params[:ratings].keys unless params[:ratings].nil?
+    @ratings_to_show = []
 
-    @movies = Movie.with_ratings(@ratings_to_show)
-    
+    session[:sort_by] = params[:sort_by] unless params[:sort_by].nil?
+    session[:ratings] = params[:ratings]
+  
+    @ratings_to_show = params[:ratings].keys unless params[:ratings].nil?
+    @movies = Movie.with_ratings(@ratings_to_show) 
     @movies = @movies.order(session[:sort_by]) unless session[:sort_by].nil?
 
     case params[:sort_by]
@@ -33,7 +34,7 @@ class MoviesController < ApplicationController
   def create
     @movie = Movie.create!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully created."
-    redirect_to movies_path
+    redirect_to movies_path(:ratings => session[:ratings])
   end
 
   def edit
@@ -44,14 +45,14 @@ class MoviesController < ApplicationController
     @movie = Movie.find params[:id]
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
-    redirect_to movie_path(@movie)
+    redirect_to movie_path(@movie, :ratings => session[:ratings])
   end
 
   def destroy
     @movie = Movie.find(params[:id])
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
-    redirect_to movies_path
+    redirect_to movies_path(:ratings => session[:ratings])
   end
 
   private
