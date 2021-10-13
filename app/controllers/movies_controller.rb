@@ -10,19 +10,18 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings
     @ratings_to_show = []
-    
-    session[:sort_by] = params[:sort_by] unless params[:sort_by].nil?
-    
     @ratings_to_show = params[:ratings].keys unless params[:ratings].nil?
     
     if !(params.has_key?(:ratings)) 
-        if session[:ratings] 
+        if session[:ratings]   #redirect if there are no parameters for ratings but we have ratings stored in session
           redirect_to movies_path(:ratings => session[:ratings]) 
         end
     end    
     @movies = Movie.with_ratings(@ratings_to_show) 
-    session[:ratings] = params[:ratings]
-    @movies = @movies.order(session[:sort_by]) unless session[:sort_by].nil?
+    session[:ratings] = params[:ratings] #update session[:ratings] if we get this point
+    
+    session[:sort_by] = params[:sort_by] unless params[:sort_by].nil?   #only reassign if it is not nil
+    @movies = @movies.order(session[:sort_by]) unless session[:sort_by].nil? #then, use the session[:sort_by] to sort
 
     case params[:sort_by]
       when 'title'
