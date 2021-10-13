@@ -16,7 +16,8 @@ class MoviesController < ApplicationController
         if session[:ratings]   #redirect if there are no parameters for ratings but we have ratings stored in session
           redirect_to movies_path(:ratings => session[:ratings]) 
         else
-          session[:ratings] = {"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1"}
+          session[:ratings] = {"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1", "NC-17"=>"1"}
+          @ratings_to_show = session[:ratings].keys
         end
     end    
     @movies = Movie.with_ratings(@ratings_to_show) 
